@@ -9,8 +9,13 @@ namespace EvernoteToOneNote
             var accessToken = args[0];
             OneNoteApi oneNote = new OneNoteApi(accessToken);
 
-            var id = oneNote.CreateNotebook("Temp Notebook");
-            oneNote.CreatePage(id, "Test title", "this is test page!");
+            var noteBookId = oneNote.CreateNotebook("Temp Notebook");
+            var sectionId = oneNote.CreateSection(noteBookId, "Temp Section");
+            oneNote.CreatePage(sectionId, new OneNoteApi.PageParameter(){
+                Title = "Test title",
+                Body = "this is test page!",
+                DateTime = DateTime.Now
+            });
         }
     }
 }
