@@ -126,7 +126,18 @@ namespace EvernoteToOneNote
             public string Title { get; set; }
             public string Body { get; set; }
             public DateTime? DateTime { get; set; }
-            public bool HasAttachment { get; set; }
+            public bool HasAttachment { get { return Attachments?.Count > 0; } }
+
+            public class AttachmentParameter
+            {
+                public string ContentType { get; set; }
+                public string Name { get; set; }
+                public string FilePath { get; set; }
+                public int Width { get; set; }
+                public int Height { get; set; }
+            }
+
+            public List<AttachmentParameter> Attachments { get; set; } = new List<AttachmentParameter>();
         }
 
         /// <summary>
@@ -154,7 +165,7 @@ namespace EvernoteToOneNote
             using (var stream = request.GetRequestStream())
             using (var writer = new System.IO.StreamWriter(stream))
             {
-                writer.Write(PageParameterToXHtml(param));
+                WritePageParameter(writer, param, boundary);
             }
 
             using (var response = request.GetResponse())
@@ -167,25 +178,49 @@ namespace EvernoteToOneNote
             }
         }
 
-        private string PageParameterToXHtml(PageParameter param, string boundary)
+        /// <summary>
+        /// PageParameter を Stream に出力する
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="param"></param>
+        /// <param name="boundary"></param>
+        private void WritePageParameter(System.IO.StreamWriter writer, PageParameter param, string boundary)
         {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"<!DOCTYPE html>");
-            stringBuilder.AppendLine($"<html>");
-            stringBuilder.AppendLine($"  <head>");
+            writer.WriteLine($"<!DOCTYPE html>");
+            writer.WriteLine($"<html>");
+            writer.WriteLine($"  <head>");
             if (!string.IsNullOrWhiteSpace(param.Title))
             {
-                stringBuilder.AppendLine($"    <title>{param.Title}</title>");
+                writer.WriteLine($"    <title>{param.Title}</title>");
             }
             if (param.DateTime.HasValue)
             {
                 var dateTime = param.DateTime.Value;
-                stringBuilder.AppendLine($"    <meta name=\"created\" content=\"{dateTime.ToString("yyyy-MM-ddTHH:mm:sszzzz")}\" />");
+                writer.WriteLine($"    <meta name=\"created\" content=\"{dateTime.ToString("yyyy-MM-ddTHH:mm:sszzzz")}\" />");
             }
-            stringBuilder.AppendLine($"  </head>");
-            stringBuilder.AppendLine($"  <body>{param.Body}</body>");
-            stringBuilder.AppendLine($"</html>");
-            return stringBuilder.ToString();
+            writer.WriteLine($"  </head>");
+            writer.WriteLine($"  <body>{param.Body}</body>");
+            writer.WriteLine($"</html>");
+
+            if (param.HasAttachment)
+            {
+                writer.WriteLine();
+                writer.WriteLine(boundary);
+                foreach (var attachment in param.Attachments)
+                {
+                    writer.WriteLine($"Content-Disposition:form-data; name=\"{attachment.Name}\"");
+                    writer.WriteLine($"Content-Type:{attachment.ContentType}");
+
+                    using (var stream = new System.IO.FileStream(attachment.FilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                    using (var reader = new System.IO.BinaryReader(stream))
+                    {
+                        var bytes = new byte[stream.Length];
+                        stream.Read(bytes, 0, bytes.Length);
+                        writer.BaseStream.Write(bytes, 0, bytes.Length);
+                    }
+                    writer.WriteLine(boundary);
+                }
+            }
         }
     }
 }
