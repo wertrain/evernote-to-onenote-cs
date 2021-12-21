@@ -4,10 +4,16 @@ using System.IO;
 using System.Text;
 using System.Xml.Linq;
 
-namespace ConsoleAppTest
+namespace EvernoteToOneNote
 {
-    class EvernoteEnex
+    /// <summary>
+    /// Evernote の .enex ファイルを表すクラス
+    /// </summary>
+    public class EvernoteEnex
     {
+        /// <summary>
+        /// ノートを表すクラス
+        /// </summary>
         public class Note
         {
             public string Title { get; set; }
@@ -16,6 +22,9 @@ namespace ConsoleAppTest
             public DateTime Updated { get; set; }
             public List<string> Tags { get; set; } = new List<string>();
 
+            /// <summary>
+            /// 属性
+            /// </summary>
             public class Attributes
             {
                 public float Latitude { get; set; }
@@ -24,8 +33,14 @@ namespace ConsoleAppTest
                 public string Author { get; set; }
             }
 
+            /// <summary>
+            /// 属性値
+            /// </summary>
             public Attributes Attribute { get; set; }
 
+            /// <summary>
+            /// 添付リソース
+            /// </summary>
             public class Resource
             {
                 public string FilePath { get; set; }
@@ -42,11 +57,22 @@ namespace ConsoleAppTest
                 public Attributes Attribute { get; set; }
             }
 
+            /// <summary>
+            /// 添付リソース
+            /// </summary>
             public List<Resource> Resources = new List<Resource>();
         }
 
+        /// <summary>
+        /// .enex に含まれるノート
+        /// </summary>
         public List<Note> Notes { get; } = new List<Note>();
-
+        
+        /// <summary>
+        /// .enex ファイルをロードする
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public bool Load(string filePath)
         {
             var root = XElement.Load(filePath);
@@ -63,7 +89,7 @@ namespace ConsoleAppTest
                 note.Content = content;
                 note.Created = DateTime.ParseExact(created, "yyyyMMddTHHmmssZ", System.Globalization.DateTimeFormatInfo.InvariantInfo, System.Globalization.DateTimeStyles.None);
                 note.Updated = DateTime.ParseExact(updated, "yyyyMMddTHHmmssZ", System.Globalization.DateTimeFormatInfo.InvariantInfo, System.Globalization.DateTimeStyles.None);
-                note.Tags.AddRange(tags);
+                note.Tags.AddRange(tags ?? new string[0]);
 
                 var attributes = new Note.Attributes();
                 if (noteElement.Element("note-attributes") != null)

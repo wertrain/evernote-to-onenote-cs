@@ -124,7 +124,7 @@ namespace EvernoteToOneNote
         public class PageParameter
         {
             public string Title { get; set; }
-            public string Body { get; set; }
+            public string Content { get; set; }
             public DateTime? DateTime { get; set; }
             public bool HasAttachment { get { return Attachments?.Count > 0; } }
 
@@ -199,7 +199,7 @@ namespace EvernoteToOneNote
                 writer.WriteLine($"    <meta name=\"created\" content=\"{dateTime.ToString("yyyy-MM-ddTHH:mm:sszzzz")}\" />");
             }
             writer.WriteLine($"  </head>");
-            writer.WriteLine($"  <body>{param.Body}</body>");
+            writer.WriteLine($"  <body>{param.Content}</body>");
             writer.WriteLine($"</html>");
 
             if (param.HasAttachment)
