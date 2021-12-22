@@ -123,20 +123,60 @@ namespace EvernoteToOneNote
         /// </summary>
         public class PageParameter
         {
+            /// <summary>
+            /// タイトル
+            /// </summary>
             public string Title { get; set; }
+
+            /// <summary>
+            /// コンテンツ
+            /// </summary>
             public string Content { get; set; }
-            public DateTime? DateTime { get; set; }
+
+            /// <summary>
+            /// ページ作成時間
+            /// </summary>
+            public DateTime? Created { get; set; }
+
+            /// <summary>
+            /// 添付ファイルが存在するかどうか
+            /// </summary>
             public bool HasAttachment { get { return Attachments?.Count > 0; } }
 
+            /// <summary>
+            /// 添付ファイル
+            /// </summary>
             public class AttachmentParameter
             {
+                /// <summary>
+                /// 添付ファイルのタイプ
+                /// </summary>
                 public string ContentType { get; set; }
+
+                /// <summary>
+                /// 添付ファイル名
+                /// </summary>
                 public string Name { get; set; }
+
+                /// <summary>
+                /// 添付ファイルまでのパス
+                /// </summary>
                 public string FilePath { get; set; }
+
+                /// <summary>
+                /// 添付ファイルの幅
+                /// </summary>
                 public int Width { get; set; }
+
+                /// <summary>
+                /// 添付ファイルの高さ
+                /// </summary>
                 public int Height { get; set; }
             }
 
+            /// <summary>
+            /// 添付ファイルのリスト
+            /// </summary>
             public List<AttachmentParameter> Attachments { get; set; } = new List<AttachmentParameter>();
         }
 
@@ -193,9 +233,9 @@ namespace EvernoteToOneNote
             {
                 writer.WriteLine($"    <title>{param.Title}</title>");
             }
-            if (param.DateTime.HasValue)
+            if (param.Created.HasValue)
             {
-                var dateTime = param.DateTime.Value;
+                var dateTime = param.Created.Value;
                 writer.WriteLine($"    <meta name=\"created\" content=\"{dateTime.ToString("yyyy-MM-ddTHH:mm:sszzzz")}\" />");
             }
             writer.WriteLine($"  </head>");
