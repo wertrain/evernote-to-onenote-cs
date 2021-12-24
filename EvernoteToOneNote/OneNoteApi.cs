@@ -10,7 +10,7 @@ namespace EvernoteToOneNote
     /// OneNote の Graph API のラッパークラス
     /// エラー処理がないので注意
     /// </summary>
-    class OneNoteApi
+    class OneNoteWrapper
     {
         /// <summary>
         /// アクセストークン
@@ -21,7 +21,7 @@ namespace EvernoteToOneNote
         /// コンストラクタ
         /// </summary>
         /// <param name="accessToken"></param>
-        public OneNoteApi(string accessToken)
+        public OneNoteWrapper(string accessToken)
         {
             AccessToken = accessToken;
         }
