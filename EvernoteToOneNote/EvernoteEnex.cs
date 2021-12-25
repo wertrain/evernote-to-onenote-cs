@@ -31,6 +31,7 @@ namespace EvernoteToOneNote
                 public float Longitude { get; set; }
                 public float Altitude { get; set; }
                 public string Author { get; set; }
+                public string SourceUrl { get; set; }
             }
 
             /// <summary>
@@ -52,6 +53,7 @@ namespace EvernoteToOneNote
                 public class Attributes
                 {
                     public string FileName { get; set; }
+                    public string SourceUrl { get; set; }
                 }
 
                 public Attributes Attribute { get; set; }
@@ -62,6 +64,11 @@ namespace EvernoteToOneNote
             /// </summary>
             public List<Resource> Resources = new List<Resource>();
         }
+
+        /// <summary>
+        /// ノート名
+        /// </summary>
+        public string Name { get; set; }
 
         /// <summary>
         /// .enex に含まれるノート
@@ -75,6 +82,8 @@ namespace EvernoteToOneNote
         /// <returns></returns>
         public bool Load(string filePath)
         {
+            Name = Path.GetFileNameWithoutExtension(filePath);
+
             var root = XElement.Load(filePath);
             foreach (var noteElement in root.Descendants("note"))
             {
@@ -102,6 +111,7 @@ namespace EvernoteToOneNote
                     if (float.TryParse(attributesElement.Element("altitude")?.Value, out var altitude))
                         attributes.Altitude = altitude;
                     attributes.Author = attributesElement.Element("author")?.Value;
+                    attributes.SourceUrl = attributesElement.Element("source-url").Value;
                     note.Attribute = attributes;
                 }
 
@@ -118,6 +128,7 @@ namespace EvernoteToOneNote
                         var resourceAttributesElement = resourceElement.Element("resource-attributes");
                         resource.Attribute = new Note.Resource.Attributes();
                         resource.Attribute.FileName = resourceAttributesElement.Element("file-name")?.Value;
+                        resource.Attribute.SourceUrl = resourceAttributesElement.Element("source-url")?.Value;
                     }
 
                     var data = resourceElement.Element("data")?.Value;
@@ -129,13 +140,27 @@ namespace EvernoteToOneNote
                         {
                             writer.Write(Convert.FromBase64String(data));
                         }
-                        File.Delete(resource.FilePath);
+                        //File.Delete(resource.FilePath);
                     }
                     note.Resources.Add(resource);
                 }
                 Notes.Add(note);
             }
             return true;
+        }
+
+        /// <summary>
+        /// 一時ファイルをクリア
+        /// </summary>
+        public void ClearTempResourceFiles()
+        {
+            foreach (var note in Notes)
+            {
+                foreach (var resource in note.Resources)
+                {
+                    File.Delete(resource.FilePath);
+                }
+            }
         }
     }
 }
