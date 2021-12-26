@@ -10,7 +10,7 @@ namespace EvernoteToOneNote
     /// OneNote の Graph API のラッパークラス
     /// エラー処理がないので注意
     /// </summary>
-    class OneNoteWrapper
+    public class OneNoteWrapper
     {
         /// <summary>
         /// アクセストークン
