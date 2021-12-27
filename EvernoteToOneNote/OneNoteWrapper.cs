@@ -254,6 +254,7 @@ namespace EvernoteToOneNote
                     using (var stream = new System.IO.FileStream(attachment.FilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
                     using (var reader = new System.IO.BinaryReader(stream))
                     {
+                        System.Diagnostics.Debug.Assert(stream.Length > 0);
                         var bytes = new byte[stream.Length];
                         stream.Read(bytes, 0, bytes.Length);
                         writer.BaseStream.Write(bytes, 0, bytes.Length);
