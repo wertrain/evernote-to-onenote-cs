@@ -104,14 +104,24 @@ namespace EvernoteToOneNote
                 if (noteElement.Element("note-attributes") != null)
                 {
                     var attributesElement = noteElement.Element("note-attributes");
+
                     if (float.TryParse(attributesElement.Element("latitude")?.Value, out var latitude))
+                    {
                         attributes.Latitude = latitude;
+                    }
+
                     if (float.TryParse(attributesElement.Element("longitude")?.Value, out var longitude))
+                    {
                         attributes.Longitude = longitude;
+                    }
+
                     if (float.TryParse(attributesElement.Element("altitude")?.Value, out var altitude))
+                    {
                         attributes.Altitude = altitude;
+                    }
+
                     attributes.Author = attributesElement.Element("author")?.Value;
-                    attributes.SourceUrl = attributesElement.Element("source-url").Value;
+                    attributes.SourceUrl = attributesElement.Element("source-url")?.Value;
                     note.Attribute = attributes;
                 }
 
@@ -119,10 +129,17 @@ namespace EvernoteToOneNote
                 {
                     var resource = new Note.Resource();
                     resource.Mime = resourceElement.Element("mime")?.Value;
+                    
                     if (int.TryParse(resourceElement.Element("width")?.Value, out var width))
+                    {
                         resource.Width = width;
+                    }
+
                     if (int.TryParse(resourceElement.Element("height")?.Value, out var height))
+                    {
                         resource.Height = height;
+                    }
+
                     if (resourceElement.Element("resource-attributes") != null)
                     {
                         var resourceAttributesElement = resourceElement.Element("resource-attributes");
