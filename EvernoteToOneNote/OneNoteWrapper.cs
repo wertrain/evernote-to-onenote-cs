@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -196,15 +197,21 @@ namespace EvernoteToOneNote
             request.Headers["Content-type"] = $"application/xhtml+xml";
             request.Method = "POST";
 
-            string boundary = string.Format("---{0:N}", Guid.NewGuid());
-            if (param.HasAttachment)
-            {
-                request.Headers["Content-type"] = $"multipart/form-data; boundary={boundary}";
-            }
+            string boundary = string.Format("{0:N}", Guid.NewGuid());
 
             using (var stream = request.GetRequestStream())
             using (var writer = new System.IO.StreamWriter(stream))
             {
+                if (param.HasAttachment)
+                {
+                    request.Headers["Content-type"] = $"multipart/form-data; boundary={boundary}";
+
+                    writer.WriteLine($"--{boundary}");
+                    writer.WriteLine($"Content-Disposition:form-data; name=\"Presentation\"");
+                    writer.WriteLine($"Content-Type:text/html");
+                    writer.WriteLine();
+                    writer.Flush();
+                }
                 WritePageParameter(writer, param, boundary);
             }
 
@@ -241,26 +248,32 @@ namespace EvernoteToOneNote
             writer.WriteLine($"  </head>");
             writer.WriteLine($"  <body>{param.Content}</body>");
             writer.WriteLine($"</html>");
+            writer.Flush();
 
             if (param.HasAttachment)
             {
-                writer.WriteLine();
-                writer.WriteLine(boundary);
                 foreach (var attachment in param.Attachments)
                 {
+                    writer.WriteLine();
+                    writer.WriteLine($"--{boundary}");
+
                     writer.WriteLine($"Content-Disposition:form-data; name=\"{attachment.Name}\"");
                     writer.WriteLine($"Content-Type:{attachment.ContentType}");
-
+                    writer.WriteLine();
+                    writer.Flush();
                     using (var stream = new System.IO.FileStream(attachment.FilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
                     using (var reader = new System.IO.BinaryReader(stream))
                     {
-                        System.Diagnostics.Debug.Assert(stream.Length > 0);
                         var bytes = new byte[stream.Length];
                         stream.Read(bytes, 0, bytes.Length);
                         writer.BaseStream.Write(bytes, 0, bytes.Length);
+                        writer.Flush();
                     }
-                    writer.WriteLine(boundary);
                 }
+
+                writer.WriteLine();
+                writer.WriteLine($"--{boundary}--");
+                writer.Flush();
             }
         }
     }
