@@ -246,7 +246,9 @@ namespace EvernoteToOneNote
                 writer.WriteLine($"    <meta name=\"created\" content=\"{dateTime.ToString("yyyy-MM-ddTHH:mm:sszzzz")}\" />");
             }
             writer.WriteLine($"  </head>");
-            writer.WriteLine($"  <body>{param.Content}</body>");
+            writer.WriteLine($"  <body>");
+            writer.WriteLine($"    {param.Content}");
+            writer.WriteLine($"  </body>");
             writer.WriteLine($"</html>");
             writer.Flush();
 
