@@ -179,6 +179,23 @@ namespace EvernoteToOneNote
             /// 添付ファイルのリスト
             /// </summary>
             public List<AttachmentParameter> Attachments { get; set; } = new List<AttachmentParameter>();
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            public class Attributes
+            {
+                public float Latitude { get; set; }
+                public float Longitude { get; set; }
+                public float Altitude { get; set; }
+                public string Author { get; set; }
+                public string SourceUrl { get; set; }
+            }
+
+            /// <summary>
+            /// 属性情報
+            /// </summary>
+            public Attributes Attribute;
         }
 
         /// <summary>
@@ -247,6 +264,8 @@ namespace EvernoteToOneNote
             }
             writer.WriteLine($"  </head>");
             writer.WriteLine($"  <body>");
+            if (param.Has)
+            writer.WriteLine($"    <blockquote>〜</blockquote>");
             writer.WriteLine($"    {param.Content}");
             writer.WriteLine($"  </body>");
             writer.WriteLine($"</html>");
