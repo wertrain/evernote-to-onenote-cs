@@ -181,21 +181,19 @@ namespace EvernoteToOneNote
             public List<AttachmentParameter> Attachments { get; set; } = new List<AttachmentParameter>();
 
             /// <summary>
-            /// 属性
+            /// ユーザー情報
             /// </summary>
-            public class Attributes
-            {
-                public float Latitude { get; set; }
-                public float Longitude { get; set; }
-                public float Altitude { get; set; }
-                public string Author { get; set; }
-                public string SourceUrl { get; set; }
-            }
+            public Object Tag { get; set; }
 
             /// <summary>
-            /// 属性情報
+            /// ユーザー情報を保持しているか
             /// </summary>
-            public Attributes Attribute;
+            public bool HasTag { get { return Tag != null; } }
+
+            /// <summary>
+            /// URL 情報
+            /// </summary>
+            public string Url { get; set; }
         }
 
         /// <summary>
@@ -264,8 +262,10 @@ namespace EvernoteToOneNote
             }
             writer.WriteLine($"  </head>");
             writer.WriteLine($"  <body>");
-            if (param.Has)
-            writer.WriteLine($"    <blockquote>〜</blockquote>");
+            if (!string.IsNullOrWhiteSpace(param.Url))
+            {
+                writer.WriteLine($"    <blockquote>{param.Url}</blockquote>");
+            }
             writer.WriteLine($"    {param.Content}");
             writer.WriteLine($"  </body>");
             writer.WriteLine($"</html>");
