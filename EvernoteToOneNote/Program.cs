@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace EvernoteToOneNote
 {
+    /// <summary>
+    /// Evernote の Enex と OneNote の連携を行う
+    /// </summary>
     public class EvernoteToOneNoteBridge
     {
         /// <summary>
